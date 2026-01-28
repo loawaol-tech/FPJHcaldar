@@ -21,10 +21,9 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        /* 讓嵌入日曆在手機上比例正確 */
         .calendar-container {
             position: relative;
-            padding-bottom: 120%; /* 針對手機端拉長顯示比例 */
+            padding-bottom: 140%; /* 針對手機端拉長顯示比例 */
             height: 0;
             overflow: hidden;
             border-radius: 1rem;
@@ -36,7 +35,6 @@
             width: 100%;
             height: 100%;
         }
-        /* 針對 iOS 輸入框優化 */
         input, textarea { font-size: 16px !important; }
     </style>
 </head>
@@ -69,15 +67,9 @@
         <!-- 登記行程區域 -->
         <div id="section-register" class="fade-in">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200">
-                <!-- 錯誤警告 -->
-                <div id="errorMessage" class="hidden mx-6 mt-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center gap-3 animate-pulse">
-                    <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
-                    <span id="errorText" class="text-sm font-semibold"></span>
-                </div>
-
                 <div id="formContent" class="p-6 md:p-8">
                     <!-- 步驟一 -->
-                    <div id="step1" class="space-y-6">
+                    <div id="step1" class="space-y-6 text-left">
                         <div class="space-y-2">
                             <label class="text-sm font-bold text-slate-500 ml-1 italic tracking-widest uppercase">Step 1. 基本資訊</label>
                             <div class="space-y-4">
@@ -87,38 +79,37 @@
                                 <input type="date" id="date" required 
                                     class="w-full rounded-2xl border-slate-200 shadow-sm p-4 bg-slate-50 border focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none">
                                 
-                                <div class="relative">
+                                <div class="relative text-left">
                                     <i data-lucide="map-pin" class="absolute left-4 top-4 w-5 h-5 text-slate-400"></i>
-                                    <input type="text" id="location" placeholder="地點 (選填，例如：三樓會議室)" 
+                                    <input type="text" id="location" placeholder="地點 (選填)" 
                                         class="w-full rounded-2xl border-slate-200 shadow-sm pl-12 pr-4 py-4 bg-slate-50 border focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none">
                                 </div>
                             </div>
                         </div>
                         <button onclick="goToStep(2)" id="btnStep1" disabled
-                            class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 disabled:bg-slate-300 shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 text-lg py-4 mt-4">
-                            下一步：設定時間 <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 disabled:bg-slate-300 shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 text-lg">
+                            下一步 <i data-lucide="chevron-right" class="w-5 h-5"></i>
                         </button>
                     </div>
 
                     <!-- 步驟二 -->
-                    <div id="step2" class="hidden space-y-6">
-                        <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-2 flex items-start gap-4 text-left">
+                    <div id="step2" class="hidden space-y-6 text-left">
+                        <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-2 flex items-start gap-4">
                             <div class="bg-indigo-600/10 p-2.5 rounded-xl text-indigo-600 shrink-0">
                                 <i data-lucide="check-square" class="w-6 h-6"></i>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h3 class="text-[11px] font-black text-indigo-400 uppercase tracking-widest mb-1">內容確認</h3>
                                 <div id="summaryTitle" class="text-slate-800 font-bold text-lg truncate">---</div>
                                 <div id="summaryDate" class="text-sm text-slate-500">---</div>
                             </div>
                         </div>
 
-                        <div class="grid grid-cols-2 gap-4 text-left">
-                            <div class="space-y-1">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="space-y-1 text-left">
                                 <label class="text-xs font-bold text-slate-400 ml-1 uppercase">開始時間</label>
                                 <input type="time" id="startTime" value="08:00" class="w-full rounded-2xl border border-slate-200 p-4 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
-                            <div class="space-y-1">
+                            <div class="space-y-1 text-left">
                                 <label class="text-xs font-bold text-slate-400 ml-1 uppercase">結束時間</label>
                                 <input type="time" id="endTime" value="09:00" class="w-full rounded-2xl border border-slate-200 p-4 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500">
                             </div>
@@ -144,11 +135,9 @@
                             <i data-lucide="check-circle" class="w-12 h-12"></i>
                         </div>
                         <h2 class="text-2xl font-bold text-slate-800">登記成功！</h2>
-                        <p class="text-slate-500 mt-2 italic px-4">資料已送至公務日曆，請切換至「確認日曆」查看。</p>
-                        
                         <div class="mt-8 flex flex-col gap-3">
                             <button onclick="switchTab('view')" class="bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 shadow-md">
-                                立即查看日曆
+                                前往查看日曆
                             </button>
                             <button onclick="resetForm()" class="text-slate-400 font-bold py-3 text-sm">
                                 繼續登記下一筆
@@ -160,7 +149,7 @@
         </div>
 
         <!-- 查看日曆區域 -->
-        <div id="section-view" class="hidden fade-in">
+        <div id="section-view" class="hidden fade-in text-left">
             <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-200 p-2">
                 <div class="bg-indigo-50 p-4 rounded-2xl mb-2 flex items-center justify-between">
                     <span class="text-xs font-bold text-indigo-700 flex items-center gap-2">
@@ -172,10 +161,9 @@
                     </button>
                 </div>
                 
-                <!-- 嵌入 Google 日曆 (已填入您的專屬 ID) -->
                 <div class="calendar-container">
                     <iframe id="calendar-iframe" 
-                        src="https://calendar.google.com/calendar/embed?src=c_02e886cfa53a5bbb687e28c19e8dc55ab7add7bb919453228ca18b4002f13e9b%40group.calendar.google.com&ctz=Asia%2FTaipei&mode=AGENDA&showNav=0&showPrint=0&showTabs=0&showCalendars=0" 
+                        src="https://calendar.google.com/calendar/embed?src=c_02e886cfa53a5bbb687e28c19e8dc55ab7add7bb919453228ca18b4002f13e9b%40group.calendar.google.com&ctz=Asia%2FTaipei&mode=AGENDA&showNav=1&showPrint=0&showTabs=0&showCalendars=0" 
                         style="border: 0" frameborder="0" scrolling="no"></iframe>
                 </div>
                 
@@ -212,17 +200,13 @@
             if (target === 'register') {
                 secReg.classList.remove('hidden');
                 secView.classList.add('hidden');
-                tabReg.classList.add('tab-active');
-                tabReg.classList.remove('tab-inactive');
-                tabView.classList.remove('tab-active');
-                tabView.classList.add('tab-inactive');
+                tabReg.className = 'pb-3 px-6 tab-active transition-all flex items-center gap-2';
+                tabView.className = 'pb-3 px-6 tab-inactive transition-all flex items-center gap-2';
             } else {
                 secReg.classList.add('hidden');
                 secView.classList.remove('hidden');
-                tabReg.classList.remove('tab-active');
-                tabReg.classList.add('tab-inactive');
-                tabView.classList.add('tab-active');
-                tabView.classList.remove('tab-inactive');
+                tabReg.className = 'pb-3 px-6 tab-inactive transition-all flex items-center gap-2';
+                tabView.className = 'pb-3 px-6 tab-active transition-all flex items-center gap-2';
                 refreshCalendar();
             }
         }
@@ -231,7 +215,7 @@
             const iframe = document.getElementById('calendar-iframe');
             const currentSrc = iframe.src;
             iframe.src = ''; 
-            setTimeout(() => { iframe.src = currentSrc; }, 100);
+            setTimeout(() => { iframe.src = currentSrc; }, 50);
         }
 
         function goToStep(step) {
@@ -254,7 +238,6 @@
         async function submitForm() {
             const submitBtn = document.getElementById('submitBtn');
             const originalHTML = submitBtn.innerHTML;
-            
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<i data-lucide="loader-2" class="animate-spin w-5 h-5"></i> 同步中...`;
             lucide.createIcons();
@@ -271,27 +254,22 @@
             try {
                 const params = new URLSearchParams();
                 params.append('jsonData', JSON.stringify(formData));
-
                 await fetch(GAS_WEB_APP_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: params.toString()
                 });
-
                 setTimeout(() => {
                     goToStep(3);
                     submitBtn.disabled = false;
                     submitBtn.innerHTML = originalHTML;
                     lucide.createIcons();
-                }, 1500);
-
+                }, 1000);
             } catch (error) {
-                document.getElementById('errorMessage').classList.remove('hidden');
-                document.getElementById('errorText').innerText = "系統忙碌中，請稍後再試。";
+                alert("提交失敗，請檢查網路連線");
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = originalHTML;
-                lucide.createIcons();
             }
         }
 
@@ -300,7 +278,6 @@
             dateInput.value = "";
             document.getElementById('location').value = "";
             document.getElementById('description').value = "";
-            document.getElementById('errorMessage').classList.add('hidden');
             checkForm1();
             goToStep(1);
         }
