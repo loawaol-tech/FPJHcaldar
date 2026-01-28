@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全校公務行事曆登記</title>
+    <!-- 使用 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        input[type="time"]::-webkit-calendar-picker-indicator,
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4">
+
+    <div id="app" class="w-full max-w-xl bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-200">
+        
+        <!-- 頂部橫幅 -->
+        <div class="bg-gradient-to-r from-indigo-600 to-blue-600 p-8 text-white text-center">
+            <i data-lucide="calendar" class="w-12 h-12 mx-auto mb-3 opacity-90"></i>
+            <h1 class="text-2xl font-bold tracking-tight">全校公務行事曆登記</h1>
+            <p class="text-white/80 text-sm mt-1">教學組自動化同步工具</p>
+        </div>
+
+        <!-- 錯誤警告 (預設隱藏) -->
+        <div id="errorMessage" class="hidden mx-6 mt-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 flex items-center gap-3 animate-pulse">
+            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
+            <span id="errorText" class="text-sm font-semibold"></span>
+        </div>
+
+        <div id="formContent" class="p-6 md:p-8">
+            <!-- 步驟一內容 -->
+            <div id="step1" class="space-y-6 fade-in">
+                <div class="space-y-1">
+                    <label class="text-sm font-bold text-slate-600 ml-1 italic">1. 活動基本資訊 *</label>
+                    <div class="space-y-4">
+                        <input type="text" id="title" required placeholder="活動名稱 (例如：[教學組] 段考)" 
+                            class="w-full rounded-2xl border-slate-200 shadow-sm p-4 bg-slate-50 border focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all">
+                        
+                        <input type="date" id="date" required 
+                            class="w-full rounded-2xl border-slate-200 shadow-sm p-4 bg-slate-50 border focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none">
+                        
+                        <div class="relative">
+                            <i data-lucide="map-pin" class="absolute left-4 top-4 w-5 h-5 text-slate-400"></i>
+                            <input type="text" id="location" placeholder="地點 (選填，例如：三樓會議室)" 
+                                class="w-full rounded-2xl border-slate-200 shadow-sm pl-12 pr-4 py-4 bg-slate-50 border focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none">
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goToStep(2)" id="btnStep1" disabled
+                    class="w-full bg-indigo-600 text-white font-bold py-4.5 rounded-2xl hover:bg-indigo-700 disabled:bg-slate-300 shadow-lg shadow-indigo-200 transition-all flex items-center justify-center gap-2 text-lg py-4">
+                    下一步：設定細節 <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <!-- 步驟二內容 (預設隱藏) -->
+            <div id="step2" class="hidden space-y-6 fade-in">
+                <!-- 摘要卡片 -->
+                <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-5 mb-2 shadow-sm flex items-start gap-4">
+                    <div class="bg-indigo-600/10 p-2.5 rounded-xl text-indigo-600 shrink-0">
+                        <i data-lucide="file-text" class="w-6 h-6"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="text-[11px] font-black text-indigo-400 uppercase tracking-widest mb-1">已填寫資訊對照</h3>
+                        <div id="summaryTitle" class="text-slate-800 font-bold text-lg leading-snug truncate">活動名稱</div>
+                        <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2 text-sm text-slate-500 font-medium">
+                            <span class="flex items-center gap-1.5"><i data-lucide="calendar" class="w-3.5 h-3.5"></i> <span id="summaryDate">2023-01-01</span></span>
+                            <span id="summaryLocWrapper" class="flex items-center gap-1.5 truncate"><i data-lucide="map-pin" class="w-3.5 h-3.5"></i> <span id="summaryLocation">地點</span></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-1 mt-4">
+                    <label class="text-sm font-bold text-slate-600 ml-1 italic">2. 時間與備註</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="relative">
+                            <i data-lucide="clock" class="absolute left-4 top-4 w-5 h-5 text-slate-400"></i>
+                            <input type="time" id="startTime" value="08:00" class="w-full rounded-2xl border border-slate-200 shadow-sm pl-12 pr-4 py-4 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="clock" class="absolute left-4 top-4 w-5 h-5 text-slate-400"></i>
+                            <input type="time" id="endTime" value="09:00" class="w-full rounded-2xl border border-slate-200 shadow-sm pl-12 pr-4 py-4 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white">
+                        </div>
+                    </div>
+                </div>
+                
+                <textarea id="description" rows="3" placeholder="備註說明 (選填)..." 
+                    class="w-full rounded-2xl border border-slate-200 shadow-sm p-4 bg-slate-50 outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white"></textarea>
+
+                <div class="flex gap-4 pt-2">
+                    <button onclick="goToStep(1)" class="flex-1 bg-slate-100 text-slate-600 font-bold py-4 rounded-2xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-1">
+                        <i data-lucide="chevron-left" class="w-4 h-4"></i> 返回修改
+                    </button>
+                    <button onclick="submitForm()" id="submitBtn"
+                        class="flex-[2] bg-indigo-600 text-white font-bold py-4 rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 flex items-center justify-center gap-2 text-lg">
+                        <span>發布活動</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 步驟三：提交成功 (預設隱藏) -->
+            <div id="step3" class="hidden text-center py-10 fade-in">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 shadow-inner text-green-600">
+                    <i data-lucide="check-circle-2" class="w-14 h-14"></i>
+                </div>
+                <h2 class="text-3xl font-bold text-slate-800 tracking-tight">登錄成功！</h2>
+                <p id="successMessage" class="text-slate-500 mt-4 text-lg font-medium leading-relaxed italic px-4"></p>
+                
+                <div class="mt-12 flex flex-col gap-4">
+                    <button onclick="resetForm()" class="bg-indigo-600 text-white font-bold py-5 rounded-2xl hover:bg-indigo-700 shadow-md transition-all active:scale-95 text-lg">
+                        繼續登記下一筆
+                    </button>
+                    <a href="https://calendar.google.com/calendar/u/0/r" target="_blank" class="text-indigo-600 font-bold flex items-center justify-center gap-2 py-4 hover:underline decoration-2 underline-offset-4">
+                        開啟日曆確認 <i data-lucide="external-link" class="w-5 h-5"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 頁尾注意事項 -->
+        <div id="footerNotice" class="bg-indigo-50/30 p-6 border-t border-slate-100 text-slate-600">
+            <div class="flex items-start gap-4">
+                <i data-lucide="info" class="w-6 h-6 text-indigo-400 shrink-0 mt-0.5"></i>
+                <div class="text-xs leading-relaxed font-medium">
+                    <p class="font-bold text-indigo-900 mb-1 text-sm">提醒：</p>
+                    <p>提交後活動將自動同步至校園公務日曆，若需修改請洽管理員。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 設定 GAS 網址
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw4s9xtg5XSQwOKnNeUYm2bzJ8cEkpUA9QsdXkMsfRKDdelKLExx_bzqdxrjfsRRi4/exec";
+
+        // 初始化圖示
+        lucide.createIcons();
+
+        // 監聽第一步輸入以啟用按鈕
+        const titleInput = document.getElementById('title');
+        const dateInput = document.getElementById('date');
+        const btnStep1 = document.getElementById('btnStep1');
+
+        function checkForm1() {
+            btnStep1.disabled = !(titleInput.value && dateInput.value);
+        }
+        titleInput.addEventListener('input', checkForm1);
+        dateInput.addEventListener('input', checkForm1);
+
+        // 切換步驟
+        function goToStep(step) {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+            document.getElementById('footerNotice').classList.remove('hidden');
+
+            if (step === 1) {
+                document.getElementById('step1').classList.remove('hidden');
+            } else if (step === 2) {
+                // 更新摘要卡片內容
+                document.getElementById('summaryTitle').innerText = titleInput.value;
+                document.getElementById('summaryDate').innerText = dateInput.value;
+                const loc = document.getElementById('location').value;
+                if (loc) {
+                    document.getElementById('summaryLocation').innerText = loc;
+                    document.getElementById('summaryLocWrapper').classList.remove('hidden');
+                } else {
+                    document.getElementById('summaryLocWrapper').classList.add('hidden');
+                }
+                document.getElementById('step2').classList.remove('hidden');
+            } else if (step === 3) {
+                document.getElementById('step3').classList.remove('hidden');
+                document.getElementById('footerNotice').classList.add('hidden');
+                document.getElementById('successMessage').innerText = `「${titleInput.value}」已送出`;
+            }
+            // 重新刷新圖示 (摘要卡片內可能有新 icon)
+            lucide.createIcons();
+        }
+
+        // 提交表單
+        async function submitForm() {
+            const submitBtn = document.getElementById('submitBtn');
+            const originalHTML = submitBtn.innerHTML;
+            
+            // 設定 Loading 狀態
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = `<svg class="animate-spin h-6 w-6 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> 同步中...`;
+
+            const formData = {
+                title: titleInput.value,
+                date: dateInput.value,
+                location: document.getElementById('location').value,
+                startTime: document.getElementById('startTime').value,
+                endTime: document.getElementById('endTime').value,
+                description: document.getElementById('description').value
+            };
+
+            try {
+                const params = new URLSearchParams();
+                params.append('jsonData', JSON.stringify(formData));
+
+                await fetch(GAS_WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: params.toString()
+                });
+
+                // 模擬網路延遲後跳轉成功頁面
+                setTimeout(() => {
+                    goToStep(3);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalHTML;
+                }, 1500);
+
+            } catch (error) {
+                document.getElementById('errorMessage').classList.remove('hidden');
+                document.getElementById('errorText').innerText = "連線異常，請確認網路狀態或 GAS 權限。";
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalHTML;
+            }
+        }
+
+        // 重置表單
+        function resetForm() {
+            titleInput.value = "";
+            dateInput.value = "";
+            document.getElementById('location').value = "";
+            document.getElementById('description').value = "";
+            document.getElementById('startTime').value = "08:00";
+            document.getElementById('endTime').value = "09:00";
+            document.getElementById('errorMessage').classList.add('hidden');
+            checkForm1();
+            goToStep(1);
+        }
+    </script>
+</body>
+</html>
